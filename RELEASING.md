@@ -26,7 +26,10 @@ flowchart LR
 
 1. Branch from `dev`, implement the change and open a PR back to `dev` (small solo changes can
    go directly to `dev`). CI runs format, Clippy, Rust tests and a relocated portable ZIP
-   test. Actions artifacts are for developers; they are not the app's automatic download channel.
+   test. The relocated check verifies package hashes, the version contract, decoder failure
+   reporting, batch continuation, source retention and overwrite refusal with no development
+   tools on PATH. It uses malformed fixtures; successful real-file conversion is an opt-in
+   local check. Actions artifacts are for developers, not the app's download channel.
 2. When ready to promote, update the version in `Cargo.toml` and `Cargo.lock`, update
    `RELEASE_NOTES.md`, and run the opt-in sample conversion (`ONENOTE_SAMPLES`).
 3. Open a PR from `dev` to `main`. Required CI must pass on the proposed merge. Merge this PR
@@ -64,8 +67,8 @@ signature (`importer-update.json.sig`) with the app-pinned public key before tru
 URL/hash. Reject incompatible protocol/schema/target, dirty builds, prereleases and downgrades.
 Do not execute branch source, unsigned latest binaries or development artifacts.
 
-`release-public-key.pem` (created once, before the first release that should be updatable from
-Goodtype) is the public verification key. Its private counterpart is the repository
+`release-public-key.pem` is this importer's public verification key, separate from Goodnotes.
+Its private counterpart is the repository
 Actions secret `IMPORTER_SIGNING_KEY`; it is available only to the successful protected-main
 publisher job. `scripts/sign_release.py` signs the exact descriptor bytes using OpenSSL and
 verifies against the checked-in public key before publication. No private key enters an artifact.

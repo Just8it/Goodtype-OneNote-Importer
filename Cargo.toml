@@ -5,7 +5,7 @@ edition = "2024"
 license = "Apache-2.0"
 publish = false
 default-run = "goodtype-onenote-import"
-repository = "https://github.com/Just8it/Goodtype-OneNote-importer"
+repository = "https://github.com/Just8it/Goodtype-OneNote-Importer"
 description = "Local OneNote notebook and section conversion into ordinary Goodtype notebooks"
 rust-version = "1.97.1"
 

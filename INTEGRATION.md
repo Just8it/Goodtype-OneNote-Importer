@@ -1,7 +1,8 @@
 # Release contract
 
-Goodtype's Library downloads, verifies and runs this tool through the same Rust-owned path it
-uses for the Goodnotes importer (Goodtype ADR 0029/0031/0032). This file is the contract.
+This tool follows the release contract used by Goodtype's Goodnotes importer (Goodtype
+ADR 0029/0031). OneNote desktop integration is separate work: it must pin a tested package
+and the OneNote public key before offering downloads or updates. This file is the contract.
 
 ## Package
 
@@ -32,7 +33,7 @@ own source, and accepts updates only through signed metadata (below).
 
 `decoderCommit` is the upstream onenote.rs commit tagged `v2.1.0`, the exact `onenote_parser`
 release locked in `Cargo.lock`. `--check` proves the executable starts and links its decoder and
-writer. Exit 0 means success; any failure exits 1.
+writer; its output is human-readable text. Exit 0 means success; any failure exits 1.
 
 ## Execution
 
@@ -60,8 +61,9 @@ An explicit update check fetches the fixed latest-release `importer-update.json`
 `importer-update.json.sig` from that exact version. The signature is Ed25519 over the exact bytes,
 verified against a public key compiled into Goodtype. The publisher signs only in the protected
 `main` release job, with the private key held as the `IMPORTER_SIGNING_KEY` repository secret.
-Until a key pair exists and Goodtype pins its public half, Goodtype offers no update check for
-this importer; a new version arrives with a Goodtype release that re-pins it.
+The public half is `release-public-key.pem`; it is distinct from the Goodnotes signing key.
+Goodtype must pin it before offering OneNote updates. Until desktop integration is implemented,
+users download versioned releases directly.
 
 ## Maintenance
 

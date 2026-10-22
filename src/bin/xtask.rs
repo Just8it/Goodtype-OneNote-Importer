@@ -36,6 +36,14 @@ fn verify() -> Result<(), String> {
             ));
         }
     }
+    let status = Command::new("python")
+        .args(["-I", "scripts/test_build.py"])
+        .current_dir(root)
+        .status()
+        .map_err(|error| format!("could not run Python build checks: {error}"))?;
+    if !status.success() {
+        return Err(format!("build verification failed ({status})"));
+    }
     println!("Verification passed.");
     Ok(())
 }

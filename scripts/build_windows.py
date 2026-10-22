@@ -19,7 +19,7 @@ NAME = "goodtype-onenote-import"
 CORE_REVISION = "01aefd9fec51ee4d06e85c7b0a48285d6ba90c0c"
 # Upstream onenote.rs commit tagged v2.1.0, the exact onenote_parser release in Cargo.lock.
 DECODER_REVISION = "727389a674665dc07e0c31818cd4b54b64b9c684"
-REPOSITORY = "https://github.com/Just8it/Goodtype-OneNote-importer"
+REPOSITORY = "https://github.com/Just8it/Goodtype-OneNote-Importer"
 
 
 def run(*args):

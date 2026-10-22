@@ -1,67 +1,81 @@
-# Goodtype OneNote Importer
+[![status](https://img.shields.io/badge/status-alpha-red)](#alpha)
+[![license](https://img.shields.io/badge/license-Apache%202.0-green)](./LICENSE)
+[![platform](https://img.shields.io/badge/platform-Windows-blue)](#use)
+[![built with](https://img.shields.io/badge/built%20with-Rust-orange)](#build)
 
-Converts OneNote notebooks and sections into ordinary [Goodtype](https://github.com/Just8it/Goodtype)
-notebooks, locally. Goodtype downloads this tool only when you choose **New → Import… → OneNote**
-in its Library; Goodtype and imported notebooks work without it.
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="brand/mark-dark.svg">
+    <img src="brand/mark-light.svg" width="130" alt="Goodtype">
+  </picture>
+</p>
 
-Status: alpha. It converts the onenote.rs sample corpus (OneNote 2016, OneNote for Windows,
-OneDrive and OneNote for the web files); real notebooks may contain content it does not yet
-carry over, and each such case is reported.
+<h1 align="center">Goodtype OneNote Importer</h1>
 
-## What you can import
+<p align="center">Bring your OneNote notebooks into Goodtype. Keep your notes on your own disk.</p>
 
-| Export | How to get it |
+Convert a OneNote section, notebook folder, package or web export into ordinary
+[Goodtype](https://github.com/Just8it/Goodtype) notebooks. Each section becomes a notebook;
+notebook folders and section groups keep their structure in the Library.
+
+Conversion works offline. No account, no upload, no telemetry. Goodtype works without this tool,
+and imported notebooks stay usable if you remove it.
+
+## Alpha
+
+> [!WARNING]
+> **The OneNote importer is experimental. Keep your original exports and review the result.**
+> Tested against the onenote.rs sample corpus; other notebooks may contain unsupported content.
+> Audio/video playback, internal page links, most note tags and ink inside table cells are not
+> carried over. Handwriting inside text containers is positioned approximately.
+
+- **Text** becomes editable Typst blocks, including formatting, lists, to-do boxes, tables and links.
+- **Equations** become Typst math; unsupported equations stay as text.
+- **Handwriting** becomes editable ink with its colour, width and transparency, at constant width.
+- **Pictures and PDF printouts** become images. Attachments are preserved as original files.
+
+Tall pages split between strokes, pictures and paragraphs, preferring empty bands. A page grows
+past A4 where a single piece of content leaves no clean cut. Each notebook keeps its original
+section in `originals/source.one` and a report of page counts and warnings. Existing destinations
+are never replaced.
+
+## Use
+
+Download the **Windows x64 ZIP** from [Releases](https://github.com/Just8it/Goodtype-OneNote-Importer/releases),
+extract it and keep the whole folder together. No Python or separate decoder installation is needed.
+
+```powershell
+.\goodtype-onenote-import.exe 'C:\Notes\Notebook.onepkg' 'C:\My Library\Imported OneNote'
+```
+
+The destination must be a new folder. `--help` lists the options; `--check` verifies the executable.
+Open the converted notebooks in Goodtype. In-app download/import integration is a separate step.
+
+| Source | How to get it |
 |---|---|
-| A section (`.one`) | OneNote for Windows: **File → Export → Section → OneNote Section (*.one)** |
-| A notebook package (`.onepkg`) | OneNote for Windows: **File → Export → Notebook → OneNote Package (*.onepkg)** |
-| A notebook folder (`.onetoc2`) | Pick the `Open Notebook.onetoc2` inside a local notebook folder |
-| A web export (`.zip`) | OneNote for the web (personal OneDrive): **Notebooks → Export notebook** |
+| Section (`.one`) | OneNote for Windows: **File → Export → Section → OneNote Section** |
+| Package (`.onepkg`) | OneNote for Windows: **File → Export → Notebook → OneNote Package** |
+| Local notebook (`.onetoc2`) | Pick `Open Notebook.onetoc2` inside the notebook folder |
+| Web export (`.zip`) | OneNote for the web, personal OneDrive: **Notebooks → Export notebook** |
 
-Each section becomes one Goodtype notebook. The OneNote notebook and its section groups become
-Library folders. Every notebook keeps the section's original file as `originals/source.one`.
+## Build
 
-## What carries over
+Requires Python 3.11+ for build checks, the pinned Rust toolchain, and Visual Studio C++ Build Tools
+on Windows. Python is used only during development; the released converter is a single executable.
 
-- **Typed text** becomes editable Typst blocks: bold, italic, underline, strikethrough,
-  super/subscript, sizes, colours, highlights, web links, alignment, indentation, bullet and
-  numbered lists, to-do boxes and tables.
-- **Equations** become Typst math (fractions, roots, sub/superscripts, integrals and sums with
-  limits, brackets, matrices, functions). An equation that cannot be converted stays as text.
-- **Handwriting** becomes editable Goodtype ink with its colour, width and transparency.
-  OneNote does not store pen pressure, so strokes have constant width.
-- **Pictures** become images (PNG/JPEG kept; GIF, BMP and TIFF converted to PNG; EMF/WMF use
-  OneNote's own web copy when present). Pictures inside text stay inside their Typst block.
-- **PDF printouts** come through as their page pictures; the attached PDF is kept.
-- **Attachments** are kept under `originals/attachments/`, marked where they sat.
-
-OneNote pages are an open canvas. A tall page becomes several A4 pages, cut only between strokes,
-pictures and paragraphs, preferring wide empty bands; a page grows past A4 only where one piece
-(a large picture or drawing) leaves no clean cut.
-
-## Not carried over
-
-Audio and video playback, OneNote-internal page links (kept as text), note tags other than
-to-do boxes, handwriting inside table cells, and ink recognition. Handwriting that sits inside a
-text container is placed next to its text approximately. Each notebook's `import-report.json`
-lists what happened per page.
-
-## Command line
-
-```text
-goodtype-onenote-import <section.one|Open Notebook.onetoc2|package.onepkg|export.zip> <NEW folder>
-goodtype-onenote-import --version --json
-goodtype-onenote-import --check
-```
-
-The destination must not exist. Results are published notebook by notebook into it, with an
-`import-report.json` listing each section. See [INTEGRATION.md](INTEGRATION.md) for the
-contract Goodtype relies on and [RELEASING.md](RELEASING.md) for releases.
-
-## Development
-
-```text
+```powershell
 cargo xtask verify
-ONENOTE_SAMPLES=<folder with .one files> cargo test -- --ignored
+python scripts/build_windows.py
+python scripts/test_bundle.py dist/goodtype-onenote-importer-0.1.0-windows-x64.zip
 ```
 
-OneNote files are never committed. License: Apache-2.0; see [THIRD_PARTY.md](THIRD_PARTY.md).
+The portable folder, ZIP and checksums appear in `dist/`. Dependencies download during setup/build
+only. [Release integration](./INTEGRATION.md) describes the version contract.
+[Development and releases](./RELEASING.md) explains `dev`/`main` promotion and automatic signed releases.
+Real-file checks are opt-in: set `ONENOTE_SAMPLES` and run `cargo test -- --ignored`.
+
+## License
+
+Apache License 2.0 — see [LICENSE](./LICENSE). The decoder is MPL-2.0 licensed;
+[THIRD_PARTY.md](./THIRD_PARTY.md) records the pinned components. Release bundles include dependency
+licenses. This project is not affiliated with or endorsed by Microsoft.

@@ -32,12 +32,7 @@ jobs:
         shell: pwsh
         run: |
           $archive = (Get-ChildItem dist/*.zip).FullName
-          $elsewhere = Join-Path $env:RUNNER_TEMP 'relocated'
-          Expand-Archive $archive $elsewhere
-          $exe = (Get-ChildItem $elsewhere -Recurse -Filter goodtype-onenote-import.exe).FullName
-          & $exe --version --json
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          & $exe --check
+          python scripts/test_bundle.py $archive
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Copy-Item RELEASE_NOTES.md dist/RELEASE_NOTES.md
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
