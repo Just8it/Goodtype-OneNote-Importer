@@ -47,6 +47,9 @@ def collect_rust_licenses(destination):
             files = [source.parents[1]/"LICENSE", source.parents[1]/"NOTICE"]
         if package.get("license_file"):
             files.append(source/package["license_file"])
+        if not files and package["name"] in ("onenote_parser", "onenote_parser-macros"):
+            # These published crates omit the license held at their pinned upstream root.
+            files = [ROOT/"licenses/onenote.rs-MPL-2.0.txt"]
         if not files:
             raise ValueError(f"no distributable license found for {package['name']}")
         target = destination/"licenses/rust"/f"{package['name']}-{package['version']}"

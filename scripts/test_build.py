@@ -18,6 +18,18 @@ sign_spec.loader.exec_module(signer)
 
 
 class BuildTests(unittest.TestCase):
+    def test_decoder_crates_include_the_pinned_upstream_license(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            packages = [{"name": name, "version": "2.1.0", "license": "MPL-2.0",
+                         "manifest_path": str(root/"missing-crate"/"Cargo.toml")}
+                        for name in ("onenote_parser", "onenote_parser-macros")]
+            with patch.object(builder.subprocess, "check_output", return_value=json.dumps({"packages": packages})):
+                builder.collect_rust_licenses(root)
+            for package in packages:
+                copied = root/"licenses/rust"/(package["name"]+"-2.1.0")/"onenote.rs-MPL-2.0.txt"
+                self.assertEqual(copied.read_bytes(), (builder.ROOT/"licenses/onenote.rs-MPL-2.0.txt").read_bytes())
+
     def test_signing_rejects_dirty_or_unrelated_publishing_commits(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
