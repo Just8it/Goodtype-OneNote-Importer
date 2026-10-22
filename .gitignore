@@ -1,0 +1,10 @@
+/target/
+/dist/
+__pycache__/
+*.pyc
+*.log
+# Personal material never belongs in this repository.
+*.one
+*.onetoc2
+*.onepkg
+*.zip

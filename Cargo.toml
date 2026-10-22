@@ -1,0 +1,32 @@
+[package]
+name = "goodtype-onenote-import"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+publish = false
+default-run = "goodtype-onenote-import"
+repository = "https://github.com/Just8it/Goodtype-OneNote-importer"
+description = "Local OneNote notebook and section conversion into ordinary Goodtype notebooks"
+rust-version = "1.97.1"
+
+# Independent of the Goodtype desktop build and its dependency lockfile.
+[workspace]
+
+[dependencies]
+# The canonical writer: Goodtype's own core, pinned, never copied.
+goodtype-core = { git = "https://github.com/Just8it/Goodtype.git", rev = "01aefd9fec51ee4d06e85c7b0a48285d6ba90c0c" }
+# OneNote decoding (MPL-2.0). Exact version; its upstream commit is reported as the decoder pin.
+onenote_parser = { version = "=2.1.0", default-features = false, features = ["native-fs"] }
+# The path type `onenote_parser` takes for a section's file name.
+typed-path = "0.12"
+# Unpacking `.onepkg` (CAB) and OneNote-for-the-web ZIP exports into bounded scratch folders.
+cab = "0.6"
+zip = { version = "2.4", default-features = false, features = ["deflate"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tempfile = "3"
+sha2 = "0.10"
+uuid = { version = "1", features = ["v4"] }
+time = { version = "0.3", features = ["formatting"] }
+# Bounded raster checks, and re-encoding GIF/BMP/TIFF pictures as PNG (originals stay in the section copy).
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "bmp", "tiff"] }
